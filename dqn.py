@@ -121,7 +121,7 @@ class DqnAgent(object):
 
     def update(self):
         states, actions, rewards, next_states, terminals = self._replay_buffer.sample()
-        actions = zip(np.arange(len(actions)), actions)
+        actions = [a for a in zip(np.arange(len(actions)), actions)]
 
         if len(states) > 0:
             next_states_q_values = self.sess.run(self._target_q_values, {self._state: next_states})

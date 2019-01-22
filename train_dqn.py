@@ -48,30 +48,19 @@ def make_environment(env_name):
     return gym.make(env_name)
 
 
-def make_agent(agent_type, env, num_clusters, use_extra_travel_penalty, use_extra_bit,
-    use_controller_dqn, use_intrinsic_timeout, use_memory, memory_size, pretrain_controller):
+def make_agent(agent_type, env):
     if agent_type == 'dqn':
-        return dqn.DqnAgent(state_dims=[2],
-                            num_actions=2) # env.action_space.n
+        return dqn.DqnAgent(state_dims=[2], num_actions=2)  # env.action_space.n
     elif agent_type == 'h_dqn':
-        meta_controller_state_fn, check_subgoal_fn, num_subgoals, subgoals = clustering.get_cluster_fn(
-            n_clusters=num_clusters, extra_bit=use_extra_bit)
+        meta_controller_state_fn, check_subgoal_fn, num_subgoals, subgoals = clustering.get_cluster_fn(n_clusters=4, extra_bit=False)
 
         return hierarchical_dqn.HierarchicalDqnAgent(
-            state_sizes=[num_subgoals, [2]],
-            agent_types=['tabular', 'network'],
+            state_sizes=[[num_subgoals], 2],
             subgoals=subgoals,
             num_subgoals=num_subgoals,
-            num_primitive_actions=2, # env.action_space.n
+            num_primitive_actions=2,  # env.action_space.n
             meta_controller_state_fn=meta_controller_state_fn,
-            check_subgoal_fn=check_subgoal_fn,
-            use_extra_travel_penalty=use_extra_travel_penalty,
-            use_extra_bit_for_subgoal_center=use_extra_bit,
-            use_controller_dqn=use_controller_dqn,
-            use_intrinsic_timeout=use_intrinsic_timeout,
-            use_memory=use_memory,
-            memory_size=memory_size,
-            pretrain_controller=pretrain_controller)
+            check_subgoal_fn=check_subgoal_fn)
 
 
 def run(env_name='MountainCar-v0',
@@ -107,9 +96,9 @@ def run(env_name='MountainCar-v0',
     env = make_environment(env_name)
     env_test = make_environment(env_name)
     # env_test = Monitor(env_test, directory='videos/', video_callable=lambda x: True, resume=True)
-    print 'Made environment!'
+    print('Made environment!')
     agent = make_agent(agent_type, env)
-    print 'Made agent!'
+    print('Made agent!')
 
     for it in range(num_iterations):
 
@@ -158,8 +147,8 @@ def run(env_name='MountainCar-v0',
             terminal = False
 
             while not terminal:
-    		if agent_type == 'dqn':
-    		    action = agent.best_action(state)
+                if agent_type == 'dqn':
+                    action = agent.best_action(state)
                 else:
                     action, info = agent.best_action(state)
                 if agent_type == 'h_dqn' and info is not None:

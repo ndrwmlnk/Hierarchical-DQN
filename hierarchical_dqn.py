@@ -7,7 +7,7 @@ https://arxiv.org/pdf/1604.06057.pdf
 from collections import defaultdict
 from dqn import DqnAgent
 import numpy as np
-from qLearning import QLearningAgent
+# from qLearning import QLearningAgent
 import sys
 
 
@@ -57,6 +57,7 @@ class HierarchicalDqnAgent(object):
         self._meta_controller_reward = 0
         self._intrinsic_time_step = 0
         self._episode = 0
+        self._original_state = None  # ndrw
 
     def get_meta_controller_state(self, state):
         returned_state = state
@@ -73,7 +74,7 @@ class HierarchicalDqnAgent(object):
 
         # Concatenate the environment state with the subgoal.
         controller_state = np.array(state)
-        controller_state = np.concatenate((controller_state, curr_subgoal), axis=0)
+        controller_state = [np.concatenate((controller_state[0], curr_subgoal), axis=0)]
 
         return np.copy(controller_state)
 
